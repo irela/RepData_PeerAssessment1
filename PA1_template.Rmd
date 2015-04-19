@@ -98,48 +98,27 @@ When comparing these values to the previous where NA values were omitted, we see
 Let's make a new column with weekday values. First I used weekday() to get the days and then set Saturdays and Sundays to "weekend" and the rest as "weekday". This exercise was run in an environment with a Finnish locale so the strings "lauantai" and "sunnuntai" were used to identify Saturday and Sunday.
 
 ```{r}
-activityFull$date <- as.Date(activityFull$date)
-activityFull$weekday <- weekdays(activityFull$date)
-activityFull$weekday[activityFull$weekday =="lauantai"] <- "weekend"
-activityFull$weekday[activityFull$weekday =="sunnuntai"] <- "weekend"
-activityFull$weekday[activityFull$weekday !="weekend"] <- "weekday"
-activityFull$weekday <- as.factor(activityFull$weekday)
+activityFilled$date <- as.Date(activityFilled$date)
+activityFilled$weekday <- weekdays(activityFilled$date)
+activityFilled$weekday[activityFilled$weekday =="lauantai"] <- "weekend"
+activityFilled$weekday[activityFilled$weekday =="sunnuntai"] <- "weekend"
+activityFilled$weekday[activityFilled$weekday !="weekend"] <- "weekday"
+activityFilled$weekday <- as.factor(activityFilled$weekday)
 ```
 
 ```{r}
-activityweekend <- activityFull[activityFull$weekday == "weekend",]
-activityweekdays <- activityFull[activityFull$weekday == "weekday",]
-```
-
-```{r}
-activity1 <- group_by(activityweekend, interval)
-aveStepByIntervalWE <- summarise_each(activity1, funs(sum), steps)
-aveStepByIntervalWE$steps <- aveStepByIntervalWE$steps /61
-```
-
-```{r}
-avgSteps <- aggregate(activityFull$steps, 
-                      list(interval = as.numeric(as.character(activityFull$interval)), 
-                           weekdays = activityFull$weekdays),
-                      FUN = "mean")
-names(avgSteps)[3] <- "meanOfSteps"
+averSteps <- aggregate(activityFilled$steps, 
+                       list(interval = activityFilled$interval,
+                      weekdays = activityFilled$weekday),
+                       FUN = "mean")
+names(averSteps)[3] <- "meanSteps"
+ View(averSteps)
 library(lattice)
-xyplot(avgSteps$meanOfSteps ~ avgSteps$interval | avgSteps$weekdays, 
-       layout = c(1, 2), type = "l", 
-       xlab = "Interval", ylab = "Number of steps")
-
+ xyplot(averSteps$meanSteps ~ averSteps$interval | averSteps$weekdays, 
+        layout = c(1, 2), type = "l", 
+        xlab = "Interval", ylab = "Number of steps")
 ```
-activity1 <- ddply (activityFull,
-              .(interval, weekday), 
-              summarize, 
-              meanSteps = mean(steps, na.rm=TRUE))
-library("lattice")
-p <- xyplot(meanSteps ~ interval | factor(weekday), data=activity1, 
-       type = 'l',
-       main="Average Number of Steps Taken 
-       \nAveraged Across All Weekday Days or Weekend Days",
-       xlab="5-Minute Interval (military time)",
-       ylab="Average Number of Steps Taken")
-print (p) 
 
+
+In the plot we can see that activity is different during weekend and weekdays. During weekend the activity is more distributed across waking hours. On weekdays there is a clear peak where most of the day's activity is concentrated.
 

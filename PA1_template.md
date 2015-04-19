@@ -156,27 +156,30 @@ Let's make a new column with weekday values. First I used weekday() to get the d
 
 
 ```r
-activityFull$date <- as.Date(activityFull$date)
-activityFull$weekday <- weekdays(activityFull$date)
-activityFull$weekday[activityFull$weekday =="lauantai"] <- "weekend"
-activityFull$weekday[activityFull$weekday =="sunnuntai"] <- "weekend"
-activityFull$weekday[activityFull$weekday !="weekend"] <- "weekday"
-activityFull$weekday <- as.factor(activityFull$weekday)
+activityFilled$date <- as.Date(activityFilled$date)
+activityFilled$weekday <- weekdays(activityFilled$date)
+activityFilled$weekday[activityFilled$weekday =="lauantai"] <- "weekend"
+activityFilled$weekday[activityFilled$weekday =="sunnuntai"] <- "weekend"
+activityFilled$weekday[activityFilled$weekday !="weekend"] <- "weekday"
+activityFilled$weekday <- as.factor(activityFilled$weekday)
 ```
 
 
 ```r
-avgSteps <- aggregate(activityFull$steps, 
-                       list(interval = activityFull$interval,
-                      weekdays = activityFull$weekday),
+averSteps <- aggregate(activityFilled$steps, 
+                       list(interval = activityFilled$interval,
+                      weekdays = activityFilled$weekday),
                        FUN = "mean")
-names(avgSteps)[3] <- "meanOfSteps"
- View(avgSteps)
+names(averSteps)[3] <- "meanSteps"
+ View(averSteps)
 library(lattice)
- xyplot(avgSteps$meanOfSteps ~ avgSteps$interval | avgSteps$weekdays, 
+ xyplot(averSteps$meanSteps ~ averSteps$interval | averSteps$weekdays, 
         layout = c(1, 2), type = "l", 
         xlab = "Interval", ylab = "Number of steps")
 ```
 
 ![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png) 
+
+
+In the plot we can see that activity is different during weekend and weekdays. During weekend the activity is more distributed across waking hours. On weekdays there is a clear peak where most of the day's activity is concentrated.
 
